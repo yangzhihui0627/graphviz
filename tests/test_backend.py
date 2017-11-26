@@ -103,7 +103,8 @@ def test_pipe_pipe_invalid_data_mocked(mocker, py2, Popen, quiet):  # noqa: N803
     Popen.assert_called_once_with(['dot', '-Tpng'],
                                   stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE, startupinfo=STARTUPINFO)
-    proc.communicate.assert_called_once_with(b'nongraph')
+    proc.stdin.write.assert_called_once_with(b'nongraph')
+    proc.communicate.assert_called_once_with()
     if not quiet:
         if py2:
             stderr.write.assert_called_once_with(errs)
@@ -123,7 +124,8 @@ def test_pipe_mocked(mocker, Popen):  # noqa: N803
     Popen.assert_called_once_with(['dot', '-Tpng'],
                                   stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE, startupinfo=STARTUPINFO)
-    proc.communicate.assert_called_once_with(b'nongraph')
+    proc.stdin.write.assert_called_once_with(b'nongraph')
+    proc.communicate.assert_called_once_with()
 
 
 @pytest.mark.usefixtures('empty_path')

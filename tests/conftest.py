@@ -70,8 +70,8 @@ def quiet(request):
 
 
 @pytest.fixture
-def pipe(mocker):
-    yield mocker.patch('graphviz.backend.pipe')
+def open_pipe(mocker):
+    yield mocker.patch('graphviz.backend.open_pipe')
 
 
 @pytest.fixture

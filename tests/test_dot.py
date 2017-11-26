@@ -63,8 +63,8 @@ def test_iter_subgraph_strict(cls):
 
 
 def test_iter_strict():
-    assert Graph(strict=True).source == 'strict graph {\n}'
-    assert Digraph(strict=True).source == 'strict digraph {\n}'
+    assert Graph(strict=True).source == 'strict graph {\n}\n'
+    assert Digraph(strict=True).source == 'strict digraph {\n}\n'
 
 
 def test_attr_invalid_kw(cls):
@@ -75,14 +75,14 @@ def test_attr_invalid_kw(cls):
 def test_attr_kw_none():
     dot = Graph()
     dot.attr(spam='eggs')
-    assert dot.source == 'graph {\n\tspam=eggs\n}'
+    assert dot.source == 'graph {\n\tspam=eggs\n}\n'
 
 
 def test_subgraph_graph_none():
     dot = Graph()
     with dot.subgraph(name='name', comment='comment'):
         pass
-    assert dot.source == 'graph {\n\t// comment\n\tsubgraph name {\n\t}\n}'
+    assert dot.source == 'graph {\n\t// comment\n\tsubgraph name {\n\t}\n}\n'
 
 
 def test_subgraph_graph_notsole(cls):
@@ -99,7 +99,7 @@ def test_subgraph_mixed(classes):
 def test_subgraph_reflexive():  # guard against potential infinite loop
     dot = Graph()
     dot.subgraph(dot)
-    assert dot.source == 'graph {\n\t{\n\t}\n}'
+    assert dot.source == 'graph {\n\t{\n\t}\n}\n'
 
 
 def test_subgraph():
@@ -144,7 +144,8 @@ def test_subgraph():
 	A -- D
 	B -- E
 	C -- F
-}'''
+}
+'''
 
 
 def test_label_html():
@@ -220,4 +221,5 @@ def test_label_html():
 </TABLE>>]
 	struct1:f1 -> struct2:f0
 	struct1:f2 -> struct3:here
-}'''
+}
+'''

@@ -146,6 +146,15 @@ def pipe(engine, format, data, quiet=False):
         graphviz.ExecutableNotFound: If the Graphviz executable is not found.
         subprocess.CalledProcessError: If the exit status is non-zero.
     """
+    piped = open_pipe(engine, format, quiet)
+    with piped as fd:
+        fd.write(data)
+    with piped as outs:
+        return outs
+
+
+@tools.multi_contextmanager
+def open_pipe(engine, format, quiet=False):
     args, _ = command(engine, format)
 
     try:
@@ -158,14 +167,16 @@ def pipe(engine, format, data, quiet=False):
         else:  # pragma: no cover
             raise
 
-    outs, errs = proc.communicate(data)
+    yield proc.stdin
+
+    outs, errs = proc.communicate()
     if proc.returncode:
         if not quiet:
             stderr_write_binary(errs)
             sys.stderr.flush()
         raise subprocess.CalledProcessError(proc.returncode, args, output=outs)
 
-    return outs
+    yield outs
 
 
 def version():

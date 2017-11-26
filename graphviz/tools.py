@@ -1,10 +1,11 @@
 # tools.py
 
 import os
+import functools
 
 from . import _compat
 
-__all__ = ['attach', 'mkdirs', 'mapping_items']
+__all__ = ['attach', 'mkdirs', 'mapping_items', 'multi_contextmanager']
 
 
 def attach(object, name):
@@ -44,3 +45,39 @@ def mapping_items(mapping, _iteritems=_compat.iteritems):
     if type(mapping) is dict:
         return iter(sorted(_iteritems(mapping)))
     return _iteritems(mapping)
+
+
+def multi_contextmanager(func):
+    """
+
+    >>> @multi_contextmanager
+    ... def spam():
+    ...      yield 'spam'
+    ...      print('and')
+    ...      yield 'eggs'
+
+    >>> s = spam()
+    >>> with s as x:
+    ...    print(x)
+    spam
+    >>> with s as x:
+    ...    print(x)
+    and
+    eggs
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return GeneratorContextmanager(func(*args, **kwargs))
+    return wrapper
+
+
+class GeneratorContextmanager(object):
+
+    def __init__(self, generator):
+        self._iter = iter(generator)
+
+    def __enter__(self):
+        return next(self._iter)
+
+    def __exit__(self, type, value, tb):
+        pass

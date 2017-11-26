@@ -68,20 +68,25 @@ def test__repr_svg_(mocker, source):
     pipe.return_value.decode.assert_called_once_with(source.encoding)
 
 
-def test_pipe_format(pipe, source, format_='svg'):
+def test_pipe_format(open_pipe, source, format_='svg'):
     assert source.format != format_
+    multi_context = open_pipe.return_value.__enter__.return_value
 
-    assert source.pipe(format=format_) is pipe.return_value
-
-    data = source.source.encode(source.encoding)
-    pipe.assert_called_once_with(source.engine, format_, data)
-
-
-def test_pipe(pipe, source):
-    assert source.pipe() is pipe.return_value
+    assert source.pipe(format=format_) is multi_context
 
     data = source.source.encode(source.encoding)
-    pipe.assert_called_once_with(source.engine, source.format, data)
+    open_pipe.assert_called_once_with(source.engine, format_)
+    multi_context.write.call_args_list == [((data,), {}), ((b'\n',), {})]
+
+
+def test_pipe(open_pipe, source):
+    multi_context = open_pipe.return_value.__enter__.return_value
+
+    assert source.pipe() is multi_context
+
+    data = source.source.encode(source.encoding)
+    open_pipe.assert_called_once_with(source.engine, source.format)
+    multi_context.write.call_args_list == [((data,), {}), ((b'\n',), {})]
 
 
 def test_filepath(test_platform, source):
